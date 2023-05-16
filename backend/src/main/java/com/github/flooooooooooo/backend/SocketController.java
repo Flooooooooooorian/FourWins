@@ -14,7 +14,13 @@ import java.util.Set;
 public class SocketController extends TextWebSocketHandler {
 
     private final Set<WebSocketSession> sessions = new HashSet<>();
+    private final ObjectMapper objectMapper;
+    private final FourWinsService fourWinsService;
 
+    public SocketController(ObjectMapper objectMapper, FourWinsService fourWinsService) {
+        this.objectMapper = objectMapper;
+        this.fourWinsService = fourWinsService;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -22,6 +28,7 @@ public class SocketController extends TextWebSocketHandler {
         sessions.add(session);
 
         System.out.println(session.getPrincipal().getName() + " Verbindung hergestellt!");
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(fourWinsService.getGame())));
     }
 
     @Override
@@ -30,6 +37,10 @@ public class SocketController extends TextWebSocketHandler {
 
         System.out.println("Nachricht empfangen: " + message.getPayload());
 
+        FourWinsTurn turn = objectMapper.readValue(message.getPayload(), FourWinsTurn.class)
+                .withPlayer(Integer.parseInt(session.getPrincipal().getName()));
+
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(fourWinsService.makeMove(turn))));
     }
 
     @Override
