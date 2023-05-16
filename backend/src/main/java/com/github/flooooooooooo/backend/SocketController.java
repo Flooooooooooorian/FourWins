@@ -40,7 +40,11 @@ public class SocketController extends TextWebSocketHandler {
         FourWinsTurn turn = objectMapper.readValue(message.getPayload(), FourWinsTurn.class)
                 .withPlayer(Integer.parseInt(session.getPrincipal().getName()));
 
-        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(fourWinsService.makeMove(turn))));
+        if (fourWinsService.isCurrentTurn(turn.player())) {
+            fourWinsService.makeMove(turn);
+        }
+
+        sendBoard();
     }
 
     @Override
@@ -49,5 +53,15 @@ public class SocketController extends TextWebSocketHandler {
         sessions.remove(session);
 
         System.out.println("Verbindung abgebrochen!");
+    }
+
+    public void sendBoard() {
+        sessions.forEach(session -> {
+            try {
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(fourWinsService.getGame())));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

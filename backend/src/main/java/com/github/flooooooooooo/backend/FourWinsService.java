@@ -11,6 +11,10 @@ public class FourWinsService {
         return game;
     }
 
+    public boolean isCurrentTurn(int player) {
+        return game.currentPlayer() == player;
+    }
+
     public FourWinGame makeMove(FourWinsTurn turn) {
         int[][] board = game.board();
         int row = board[turn.column()].length - 1;

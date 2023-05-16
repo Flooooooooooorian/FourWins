@@ -1,5 +1,5 @@
-import { ReactElement, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { ReactElement, useState } from "react";
+import { Button, Text, TextInput, View } from "react-native";
 import FourWinsBoard from "./FourWinsBoard";
 import { Game } from "./models";
 import Buffer from "buffer";
@@ -22,7 +22,7 @@ function FourWins(): ReactElement {
     setGame(JSON.parse(event.data));
   };
 
-  useEffect(() => {
+  const establishWebsocketConnection = () => {
     let encodedCredentials = new Buffer.Buffer(user.username + ":" + user.password).toString("base64");
     const websocketConfig = { headers: { "Authorization": "Basic " + encodedCredentials } };
     const ws = new WebSocket("ws://192.168.1.132:8080/ws/app", null, websocketConfig);
@@ -30,8 +30,7 @@ function FourWins(): ReactElement {
     ws.onclose = onClose;
     ws.onmessage = onMessage;
     setWs(ws);
-  }, []);
-
+  };
 
   const onPlay = (column: number) => {
     if (ws) {
@@ -41,8 +40,18 @@ function FourWins(): ReactElement {
 
   return (
     <View>
-      <Text>FourWins</Text>
-      {game && <FourWinsBoard game={game} onPlay={onPlay} isTurn={game.currentPlayer === user.username}/>}
+      <Text style={{ fontSize: 20 }}>FourWins</Text>
+      <TextInput value={String(user.username)}
+                 placeholder="Username"
+                 onChangeText={(text) => setUser(prevState => ({ ...prevState, username: Number(text) }))} />
+      <TextInput value={user.password}
+                 placeholder="Passwort"
+                 onChangeText={(text) => setUser(prevState => ({ ...prevState, password: text }))} />
+      <Button title="Login" onPress={() => {
+        establishWebsocketConnection();
+      }} />
+
+      {game && <FourWinsBoard game={game} onPlay={onPlay} isTurn={game.currentPlayer === user.username} />}
     </View>
   );
 }
