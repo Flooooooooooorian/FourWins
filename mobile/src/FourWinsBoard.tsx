@@ -5,8 +5,9 @@ import { Pressable, Text, View } from "react-native";
 type GameProps = {
   game: Game;
   onPlay: (column: number) => void;
+  isTurn: boolean;
 }
-export default function FourWinsBoard({ game, onPlay }: GameProps) {
+export default function FourWinsBoard({ game, onPlay, isTurn }: GameProps) {
 
   return (
     <View style={{
@@ -17,13 +18,13 @@ export default function FourWinsBoard({ game, onPlay }: GameProps) {
       borderColor: "blue",
       borderWidth: 1
     }}>
-      {game.board.map((row, column) => <FourWinsBoardColumn row={row} key={column} onPress={() => onPlay(column)} />
+      {game.board.map((row, column) => <FourWinsBoardColumn row={row} isTurn={isTurn} key={column} onPress={() => onPlay(column)} />
       )}
     </View>
   );
 }
 
-function FourWinsBoardColumn({ row, onPress }: { row: number[], onPress: () => void }) {
+function FourWinsBoardColumn({ row, onPress, isTurn }: { row: number[], onPress: () => void, isTurn: boolean }) {
 
   return (
     <View style={{
@@ -32,7 +33,7 @@ function FourWinsBoardColumn({ row, onPress }: { row: number[], onPress: () => v
       flexDirection: "column",
       justifyContent: "flex-end",
     }}>
-      {row[0] === 0 && <Pressable onPress={onPress} style={{
+      {isTurn && row[0] === 0 && <Pressable onPress={onPress} style={{
         borderStyle: "solid",
         borderColor: "black",
         borderWidth: 1,

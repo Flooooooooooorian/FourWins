@@ -2,8 +2,10 @@ import { ReactElement, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import FourWinsBoard from "./FourWinsBoard";
 import { Game } from "./models";
+import Buffer from "buffer";
 
 function FourWins(): ReactElement {
+  const [user, setUser] = useState({ username: 1, password: "Test1" });
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [game, setGame] = useState<Game | null>(null);
 
@@ -21,7 +23,8 @@ function FourWins(): ReactElement {
   };
 
   useEffect(() => {
-    const websocketConfig = { headers: { "Authorization": "Basic MTpUZXN0MQ==" } };
+    let encodedCredentials = new Buffer.Buffer(user.username + ":" + user.password).toString("base64");
+    const websocketConfig = { headers: { "Authorization": "Basic " + encodedCredentials } };
     const ws = new WebSocket("ws://192.168.1.132:8080/ws/app", null, websocketConfig);
     ws.onopen = onOpen;
     ws.onclose = onClose;
@@ -39,7 +42,7 @@ function FourWins(): ReactElement {
   return (
     <View>
       <Text>FourWins</Text>
-      {game && <FourWinsBoard game={game} onPlay={onPlay} />}
+      {game && <FourWinsBoard game={game} onPlay={onPlay} isTurn={game.currentPlayer === user.username}/>}
     </View>
   );
 }
