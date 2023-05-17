@@ -25,7 +25,7 @@ function FourWins(): ReactElement {
   const establishWebsocketConnection = () => {
     let encodedCredentials = new Buffer.Buffer(user.username + ":" + user.password).toString("base64");
     const websocketConfig = { headers: { "Authorization": "Basic " + encodedCredentials } };
-    const ws = new WebSocket("ws://192.168.1.132:8080/ws/app", null, websocketConfig);
+    const ws = new WebSocket("ws://localhost:8080/ws/app", null, websocketConfig);
     ws.onopen = onOpen;
     ws.onclose = onClose;
     ws.onmessage = onMessage;
@@ -52,6 +52,9 @@ function FourWins(): ReactElement {
       }} />
 
       {game && <FourWinsBoard game={game} onPlay={onPlay} isTurn={game.currentPlayer === user.username} />}
+      <Text style={{fontSize: 15}}>
+        {game && game.winner}
+      </Text>
     </View>
   );
 }
